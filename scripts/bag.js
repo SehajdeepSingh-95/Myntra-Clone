@@ -1,4 +1,3 @@
-const CONVENIENCE_FEES = 99;
 let bagItemObjects;
 onLoad();
 
@@ -13,15 +12,23 @@ function displayBagSummary() {
   let totalItem = bagItemObjects.length;
   let totalMRP = 0;
   let totalDiscount = 0;
-
+  
   bagItemObjects.forEach(bagItem => {
     totalMRP += bagItem.original_price;
     totalDiscount += bagItem.original_price - bagItem.current_price;
   });
-
-  let finalPayment = totalMRP - totalDiscount + CONVENIENCE_FEES;
   
-
+  let convenienceFee = 0;
+  if (totalItem === 0) {
+    convenienceFee = 0;
+  } else if (totalMRP <= 1000) {
+    convenienceFee = 99;
+  } else {
+    convenienceFee = 9.80;
+  }
+  
+  let finalPayment = totalMRP - totalDiscount + convenienceFee;
+  
   bagSummaryElement.innerHTML = `
     <div class="bag-details-container">
     <div class="price-header">PRICE DETAILS (${totalItem} Items) </div>
@@ -35,12 +42,12 @@ function displayBagSummary() {
     </div>
     <div class="price-item">
       <span class="price-item-tag">Convenience Fee</span>
-      <span class="price-item-value">₹99</span>
+      <span class="price-item-value">₹${convenienceFee.toFixed(2)}</span>
     </div>
     <hr>
     <div class="price-footer">
       <span class="price-item-tag">Total Amount</span>
-      <span class="price-item-value">₹${finalPayment}</span>
+      <span class="price-item-value">₹${finalPayment.toFixed(2)}</span>
     </div>
   </div>
   <button class="btn-place-order">
@@ -100,7 +107,6 @@ function generateItemHTML(item) {
         <span class="delivery-details-days">${item.delivery_date}</span>
       </div>
     </div>
-
     <div class="remove-from-cart" onclick="removeFromBag(${item.id})">X</div>
   </div>`;
 }
